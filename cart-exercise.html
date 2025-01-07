@@ -193,7 +193,6 @@
       // Initialize or retrieve cart from local storage
       let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-
       //Function to add products to cart
       function addToCart(productId) {
         const product = products.find(p => p.id === productId);
@@ -218,7 +217,9 @@
 
       // Function to remove product from cart
       function removeFromCart(productId) {
-        cart = cart.filter((item) => item.id !== productId);
+
+        cart = cart.filter((item) => item.product.id !== productId);
+        console.log(cart)
         localStorage.setItem("cart", JSON.stringify(cart));
         renderCart();
       }
@@ -243,13 +244,13 @@
           const qty=document.createElement("p");
           const totalTag=document.createElement("p");
           const deleteBtn=document.createElement("button");
-          deleteBtn.id="btn"+item.product.id;
-      
+          deleteBtn.id="btn-"+item.product.id;
+          deleteBtn.addEventListener("click",()=>{
+            removeFromCart(item.product.id);
+          });
 
           deleteBtn.className="delete-btn";
           cartItem.className="cart-item";
-
-          console.log(item);
           
           const price = (item.qty*item.product.price).toFixed(2);
 
@@ -268,8 +269,6 @@
           cartItem.appendChild(details);
           cartItem.appendChild(actions);
           cartBody.appendChild(cartItem);
-
-          //total=total+parseInt(price);
           
           total+=Number(price);
         });
