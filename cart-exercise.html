@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Listing</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 20px;
+        padding: 20px;
+      }
+      .product-container {
+        display: flex;
+        flex-direction: column;
+        flex: 3;
+        gap: 20px;
+      }
+      .product-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+      .product-card {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      .product-card h3 {
+        margin: 10px 0;
+      }
+      .product-card p {
+        margin: 8px 0;
+        font-size: 14px;
+        color: #555;
+      }
+      .product-card input {
+        width: 50px;
+        margin: 10px 0;
+        text-align: center;
+      }
+      .product-card button {
+        background-color: #363636;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 8px;
+        cursor: pointer;
+      }
+      .product-card button:hover {
+        background-color: #2950ff;
+      }
+      .cart-container {
+        flex: 1;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 5px;
+      }
+      .cart-container h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+      }
+      .cart-item:last-child {
+        border-bottom: none;
+      }
+      .cart-item .details {
+        flex: 1;
+      }
+      .cart-item .actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .delete-btn {
+        color: #ff5733;
+        border: none;
+        border-radius: 5px;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+      .delete-btn:hover {
+        color: #fff;
+        background-color: #c70039;
+      }
+      .cart-total {
+        text-align: center;
+        font-weight: bold;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="product-container">
+      <h1>Product Listing</h1>
+      <div class="product-grid" id="product-container"></div>
+    </div>
+
+    <div class="cart-container">
+      <h2>Cart</h2>
+      <div id="cart-body">
+        <!-- Cart details will be dynamically added here -->
+      </div>
+      <div class="cart-total" id="cart-total">Total: $0.00</div>
+    </div>
+
+    <script>
+      //TODO #1  Complete the Product data stored in JSON
+      const products = [
+        {
+          id: 1,
+          name: "Caffe Latte",
+          price: 4.25,
+        },
+        {
+          id: 2,
+          name: "Cappuccino",
+          price: 4.45,
+        },
+        {
+          id: 3,
+          name: "Caramel Macchiato",
+          price: 4.95,
+        },
+        {
+          id: 4,
+          name: "Mocha",
+          price: 5.25,
+        },
+        {
+          id: 5,
+          name: "Espresso",
+          price: 3.45,
+        },
+        {
+          id: 6,
+          name: "Tea",
+          price: 3.65,
+        },
+      ];
+
+      const productContainer = document.getElementById("product-container");
+
+      //Function to render product cards
+      function renderProducts() {
+        products.forEach((product) => {
+          const productCard = document.createElement("div");
+          productCard.className = "product-card";
+
+          //TODO #2 complete the product details with input field and button
+          const cardName=document.createElement("h3");
+          const cardPrice=document.createElement("p");
+          const cartQuantity=document.createElement("input");
+          cartQuantity.id="qty-"+product.id;
+          cartQuantity.type="number";
+          cartQuantity.value="1";
+          cartQuantity.min="1";
+
+          const addToCartBtn=document.createElement("button");
+
+          cardName.textContent=product.name;
+          cardPrice.textContent="Price : $"+product.price;
+          cartQuantity.textContent=1;
+          addToCartBtn.textContent="Add to cart"
+          addToCartBtn.addEventListener("click",()=>{
+            addToCart(product.id);
+          })
+
+          productCard.appendChild(cardName);
+          productCard.appendChild(cardPrice);
+          productCard.appendChild(cartQuantity);
+          productCard.appendChild(addToCartBtn);
+          productContainer.appendChild(productCard);
+        });
+      }
+
+      // Initialize or retrieve cart from local storage
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+
+      //Function to add products to cart
+      function addToCart(productId) {
+        const product = products.find(p => p.id === productId);
+        // Check if product is already in cart
+        // If yes, increment the quantity
+        // If no, add the product to cart
+        //TODO #3 complete the logic to add product to cart
+        const item = cart.find(i => i.product.id===productId);
+    
+        if(item){
+          item.qty=parseInt(item.qty)+parseInt(document.getElementById("qty-"+productId).value);
+        }else{
+          cart.push({
+            product:product,
+            qty:parseInt(document.getElementById("qty-"+product.id).value)
+          });
+        }
+        
+        localStorage.setItem("cart", JSON.stringify(cart));
+        renderCart();
+      }
+
+      // Function to remove product from cart
+      function removeFromCart(productId) {
+        cart = cart.filter((item) => item.id !== productId);
+        localStorage.setItem("cart", JSON.stringify(cart));
+        renderCart();
+      }
+
+      // Function to render cart items
+      function renderCart() {
+        const cartBody = document.getElementById("cart-body");
+        const cartTotal = document.getElementById("cart-total");
+        cartBody.innerHTML = "";
+
+        let total = 0;
+
+        cart.forEach((item) => {
+         //TODO #4 complete the cart item details
+          const cartItem=document.createElement("div");
+          const details=document.createElement("div");
+          const actions=document.createElement("div");
+          details.className="details";
+          actions.className="actions";
+
+          const itemName=document.createElement("h4");
+          const qty=document.createElement("p");
+          const totalTag=document.createElement("p");
+          const deleteBtn=document.createElement("button");
+          deleteBtn.id="btn"+item.product.id;
+      
+
+          deleteBtn.className="delete-btn";
+          cartItem.className="cart-item";
+
+          console.log(item);
+          
+          const price = (item.qty*item.product.price).toFixed(2);
+
+          itemName.textContent=item.product.name;
+          qty.textContent="Qty: "+item.qty+" | Unit price: $"+item.product.price+" | ";
+          
+          totalTag.textContent="Subtotal: $"+price;
+          deleteBtn.textContent="Delete";
+      
+
+          details.appendChild(itemName);
+          details.appendChild(qty);
+          details.appendChild(totalTag);
+          actions.appendChild(deleteBtn);
+
+          cartItem.appendChild(details);
+          cartItem.appendChild(actions);
+          cartBody.appendChild(cartItem);
+
+          //total=total+parseInt(price);
+          
+          total+=Number(price);
+        });
+
+
+        cartTotal.textContent = `Total: $${total.toFixed(2)}`;
+      }
+
+      // Initial rendering
+      renderProducts();
+      renderCart();
+    </script>
+  </body>
+</html>
